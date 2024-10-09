@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package videoconf;
+
+service ConferenceService {
+    // RPC сервисы могут быть добавлены здесь
+}
+
+message User {
+    string id = 1;
+    string username = 2;
+    string email = 3;
+}

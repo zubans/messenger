@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Broadcast WebSocket Test</title>
+</head>
+<body>
+<h1>WebSocket Broadcast Test</h1>
+<input type="text" id="messageInput" placeholder="Enter message" />
+<button onclick="sendMessage()">Send Message</button>
+<ul id="messages"></ul>
+
+<script>
+    // Подключаемся по WebSocket
+    const ws = new WebSocket('ws://localhost:8080/signal');
+
+    ws.onopen = () => {
+        console.log('WebSocket connection opened');
+    };
+
+    ws.onerror = (error) => {
+        console.error('WebSocket error: ', error);
+    };
+
+    ws.onmessage = (event) => {
+        const messages = document.getElementById('messages');
+        const messageItem = document.createElement('li');
+        messageItem.textContent = `Received: ${event.data}`;
+        messages.appendChild(messageItem);
+    };
+
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value;
+        ws.send(message);
+        input.value = '';
+    }
+
+    window.onbeforeunload = () => {
+        ws.close();
+    };
+</script>
+</body>
+</html>
