@@ -12,8 +12,8 @@ RUN go mod tidy
 
 # Копируем весь исходный код и загружаем зависимости
 COPY . .
-RUN #go get ./...        # Загрузка и установка всех зависимостей
-RUN #go build -o video-conference ./cmd/server
+RUN go get ./...        # Загрузка и установка всех зависимостей
+RUN go build -o video-conference ./cmd/server
 
 # Используем второй stage для минимального размера финального образа
 # FROM alpine:latest

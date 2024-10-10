@@ -2,27 +2,43 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
-	"github.com/jackc/pgx/v4"
 	"log"
+	"time"
+
+	_ "github.com/lib/pq"
 )
 
-var Conn *pgx.Conn
+var DB *sql.DB
 
 func ConnectDB() error {
-	conn, err := pgx.Connect(context.Background(), fmt.Sprintf(
-		"postgresql://%s:%s@%s:%s/%s",
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		"user",
 		"password",
-		"localhost", // IP-адрес или имя хоста контейнера postgres
+		"localhost",
 		"5432",
 		"videoconference",
-	))
+	)
+	var err error
+	DB, err = sql.Open("postgres", connStr)
 	if err != nil {
 		return err
 	}
 
-	Conn = conn
-	log.Println("Connected to PostgreSQL database!")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := DB.PingContext(ctx); err != nil {
+		return err
+	}
+
+	log.Println("Connected to PostgreSQL database")
 	return nil
+}
+
+func CloseDB() {
+	if DB != nil {
+		DB.Close()
+	}
 }

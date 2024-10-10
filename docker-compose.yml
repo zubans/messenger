@@ -1,16 +1,18 @@
-version: '3.8'
-
 services:
   app:
     build: .
+    tty: true
     ports:
       - "8080:8080"
     volumes:
       - .:/app
+    command: ["/app/video-conference" ]
     env_file:
       - .env
     depends_on:
       - postgres
+    networks:
+      - messenger
 
   postgres:
     image: "postgres:latest"
@@ -22,6 +24,12 @@ services:
       POSTGRES_DB: videoconference
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - messenger
+
+networks:
+  messenger:
+    external: true
 
 volumes:
   pgdata:
