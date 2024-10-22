@@ -10,9 +10,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var DB *sql.DB
+//var DB *sql.DB
 
-func ConnectDB() error {
+func (repo *RepositoryImpl) ConnectDB() error {
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		"user",
 		"password",
@@ -21,7 +21,7 @@ func ConnectDB() error {
 		"videoconference",
 	)
 	var err error
-	DB, err = sql.Open("postgres", connStr)
+	repo.DB, err = sql.Open("postgres", connStr)
 	if err != nil {
 		return err
 	}
@@ -29,7 +29,7 @@ func ConnectDB() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if err := DB.PingContext(ctx); err != nil {
+	if err := repo.DB.PingContext(ctx); err != nil {
 		return err
 	}
 
@@ -37,8 +37,8 @@ func ConnectDB() error {
 	return nil
 }
 
-func CloseDB() {
-	if DB != nil {
-		DB.Close()
+func (repo *RepositoryImpl) CloseDB() {
+	if repo.DB != nil {
+		repo.DB.Close()
 	}
 }

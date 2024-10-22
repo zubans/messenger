@@ -3,6 +3,7 @@ module video-conference
 go 1.19
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
@@ -11,3 +12,5 @@ require (
 	github.com/rs/cors v1.11.1
 	golang.org/x/crypto v0.28.0
 )
+
+require github.com/golang/mock v1.6.0

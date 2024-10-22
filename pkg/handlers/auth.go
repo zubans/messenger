@@ -7,12 +7,11 @@ import (
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
-	"video-conference/pkg/db"
 	"video-conference/pkg/models"
 	"video-conference/pkg/utils"
 )
 
-func Register(w http.ResponseWriter, r *http.Request) {
+func (repos *Repos) Register(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Username string `json:"username"`
 		Email    string `json:"email"`
@@ -38,7 +37,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := db.SaveUser(user); err != nil {
+	if err := repos.UserRepo.SaveUser(user); err != nil {
 		http.Error(w, "Failed to save user", http.StatusInternalServerError)
 		return
 	}
@@ -47,7 +46,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode("User registered successfully")
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func (repos *Repos) Login(w http.ResponseWriter, r *http.Request) {
 	var credentials struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -60,7 +59,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	user, err := db.FindUserByUsername(credentials.Username)
+	user, err := repos.UserRepo.FindUserByUsername(credentials.Username)
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password)) != nil {
 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 		return
@@ -87,12 +86,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: time.Now(),
 	}
 
-	// Сохранение токена в базе данных
-	if err := db.SaveToken(token); err != nil {
+	if err := repos.TokenRepo.SaveToken(token); err != nil {
 		http.Error(w, "Failed to save token", http.StatusInternalServerError)
 		return
 	}
 
-	// Возврат токена клиенту
 	json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
 }
